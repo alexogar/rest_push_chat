@@ -2,26 +2,78 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Atmosphere Chat</title>
-    <script type="text/javascript" src="jquery/jquery-2.0.3.js"></script>
-    <script type="text/javascript" src="jquery/jquery.atmosphere.js"></script>
-    <script type="text/javascript" src="jquery/application.js"></script>
-    <style>
-    * {font-family: tahoma; font-size: 12px; padding: 0px; margin: 0px;}
-    p {line-height: 18px;}
-    div {width: 500px; margin-left: auto; margin-right: auto;}
-    #content {padding: 5px; background: #ddd; border-radius: 5px; border: 1px solid #CCC; margin-top: 10px;}
-    #header {padding: 5px; background: #f5deb3; border-radius: 5px; border: 1px solid #CCC; margin-top: 10px;}
-    #input {border-radius: 2px; border: 1px solid #ccc; margin-top: 10px; padding: 5px; width: 400px;}
-    #status {width: 88px; display: block; float: left; margin-top: 15px;}
-    </style>
+    <title>Chat sample</title>
+    <link rel="stylesheet" href="webjars/bootstrap/3.1.0/css/bootstrap.css"/>
+    <link rel="stylesheet" href="application.css"/>
+    <script type="text/javascript" src="webjars/momentjs/2.5.0/moment.js"></script>
+    <script type="text/javascript" src="webjars/jquery/2.1.0/jquery.js"></script>
+    <script type="text/javascript" src="webjars/jquery-atmosphere/2.0.3/jquery.atmosphere.js"></script>
+    <script type="text/javascript" src="webjars/bootstrap/3.1.0/js/bootstrap.js"></script>
+    <script type="text/javascript" src="application.js"></script>
 </head>
 <body>
-    <div id="header"><h3>Atmosphere Chat. Default transport is WebSocket, fallback is long-polling</h3></div>
-    <div id="content"></div>
-    <div>
-        <span id="status">Connecting...</span>
-        <input type="text" id="input" disabled="disabled"/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span class="glyphicon glyphicon-comment"></span> Chat
+                </div>
+                <div class="panel-body" id="scroll">
+                    <ul class="chat" id="chat">
+
+                    </ul>
+                </div>
+                <div class="panel-footer">
+                    <div class="input-group">
+                        <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here..." />
+                        <span class="input-group-btn">
+                            <button class="btn btn-warning btn-sm" id="btn-chat">
+                                Send</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
+
+<div id="login_form" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Registration</h4>
+            </div>
+            <div class="modal-body">
+                <div id="login_form_name_container" class="form-group">
+                    <label for="login_form_name">Username:</label>
+                    <input id="login_form_name" class="form-control" placeholder="Enter username" name="login_form_name" type="text"/>
+                </div>
+                <i class="fa fa-spinner"></i>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="login_form_enter" class="btn btn-primary">Enter chatroom</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>Processing...</h1>
+            </div>
+            <div class="modal-body">
+                <div class="progress progress-striped active">
+                    <div class="progress-bar"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                        <span class="sr-only">100% Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
