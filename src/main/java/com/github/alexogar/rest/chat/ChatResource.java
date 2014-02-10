@@ -22,8 +22,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.atmosphere.annotation.Broadcast;
 import org.atmosphere.annotation.Suspend;
 import org.atmosphere.config.service.AtmosphereService;
-import org.atmosphere.cpr.AtmosphereResourceEvent;
-import org.atmosphere.cpr.AtmosphereResourceEventListenerAdapter;
+import org.atmosphere.cpr.*;
 import org.atmosphere.jersey.JerseyBroadcaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -49,7 +49,9 @@ public class ChatResource {
 
     private volatile static List<Message> messages = new CopyOnWriteArrayList<Message>();
 
-    private volatile Map<String,String> users = new ConcurrentHashMap<String, String>();
+    @Context
+    private AtmosphereResource resource;
+
 
     @XmlRootElement(name="list")
     @XmlSeeAlso(value = {Message.class})
@@ -57,6 +59,26 @@ public class ChatResource {
         public T[] list;
         public ListWrapper() {}
         public ListWrapper(List<Message> list) {this.list = (T[]) list.toArray();}
+    }
+
+    @POST
+    @ApiOperation(value = "Post new message")
+    @Path("/messages")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Author doesn`t exists"),
+            @ApiResponse(code = 200, message = "Posted"),
+            @ApiResponse(code = 409, message = "Bad request")
+    })
+    public Response newMessage(Message message) {
+        if (message.author == null || message.author.isEmpty() ||
+            message.message == null || message.message.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        messages.add(message);
+        resource.getBroadcaster().broadcast(message);
+
+        return Response.ok().build();
     }
 
     @GET
@@ -72,18 +94,6 @@ public class ChatResource {
         else return Response.ok(new ListWrapper<Message>(messages)).build();
     }
 
-    @GET
-    @ApiOperation(response = List.class, value = "Return all users in room")
-    @ApiResponses({
-            @ApiResponse(code = 204, message = "User list empty"),
-            @ApiResponse(code = 200, message = "List with users")
-    })
-    @Produces("application/json")
-    @Path("/users")
-    public Response users() {
-        if (users.isEmpty()) return Response.noContent().build();
-        else return Response.ok(users.keySet()).build();
-    }
 
     /**
      * Suspend the response without writing anything back to the client.
